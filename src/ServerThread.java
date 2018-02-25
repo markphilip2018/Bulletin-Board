@@ -21,26 +21,25 @@ public class ServerThread extends Thread {
 	public void run() {
 		try {
 
-			System.out.println("wait for the msg.");
 			dataInputStream = new DataInputStream(socket.getInputStream());
 
-			length = dataInputStream.readInt(); // i send the length at first
+			length = dataInputStream.readInt();
 
-			dataBytes = new byte[length]; // create array as a buffer
+			dataBytes = new byte[length];
 
-			dataInputStream.read(dataBytes); // read the data into the buffer array
+			dataInputStream.read(dataBytes);
 
-			msg = new String(dataBytes); // convert to string
-			System.out.println("client " + " :" + msg);
-
-			MainServer.increaseRnum();
-			
-			Thread.sleep((long)(Math.random() * 1000));
+			msg = new String(dataBytes);
 
 			String[] splittedArray = msg.split(" ");
 
+			if (splittedArray[0].equals("reader"))
+				MainServer.increaseRnum();
+
+			Thread.sleep((long) (Math.random() * 1000));
+
 			int id = Integer.valueOf(splittedArray[1]);
-			
+
 			int[] arr = MainServer.serviceReader(id);
 
 			DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
@@ -57,13 +56,17 @@ public class ServerThread extends Thread {
 				dataOutputStream.write(msg.getBytes());
 
 				dataOutputStream.flush();
-				
+
 				MainServer.decreaseRnum();
+
+				if (arr[2] == arr[0])
+					MainServer.closeServer();
+
 			} else if (splittedArray[0].equals("writer")) {
 
 				// read the value
 				MainServer.changeValue(id);
-				String msg = rseq + " " + arr[0] ;
+				String msg = rseq + " " + arr[0];
 
 				int msgLength = msg.getBytes().length;
 
@@ -72,8 +75,9 @@ public class ServerThread extends Thread {
 				dataOutputStream.write(msg.getBytes());
 
 				dataOutputStream.flush();
-				
-				MainServer.decreaseRnum();
+
+				if (arr[2] == arr[0])
+					MainServer.closeServer();
 
 			} else {
 

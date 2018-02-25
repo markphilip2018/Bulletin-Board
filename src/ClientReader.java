@@ -7,59 +7,48 @@ import java.net.UnknownHostException;
 import java.util.LinkedList;
 
 public class ClientReader {
-	
-	
+
 	public static void main(String[] args) throws UnknownHostException, IOException {
 
 		LinkedList<String> clientReader = new LinkedList<>();
-		
+
 		String serverIp = args[0];
-		System.out.println(serverIp);
 		int port = Integer.valueOf(args[1]);
-		System.out.println("port = " +port);
 		int numberOfAccesses = Integer.valueOf(args[2]);
 		int clientNumber = Integer.valueOf(args[3]);
 
 		for (int i = 0; i < numberOfAccesses; i++) {
-			System.out.println("clinet main started..");
-			Socket socket = new Socket(serverIp, port);
-			System.out.println("connected to server successfully.");
 
+			Socket socket = new Socket(serverIp, port);
 			DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
 
-			String msg = "reader "+clientNumber;
-			int msgLength = msg.getBytes().length; // calculate the msg length in bytes
-
-			dataOutputStream.writeInt(msgLength); // set the msg first to the length of the msg
-
-			dataOutputStream.write(msg.getBytes()); // write the msg in Bytes
-
-			dataOutputStream.flush(); // send the msg
+			String msg = "reader " + clientNumber;
+			int msgLength = msg.getBytes().length;
+			dataOutputStream.writeInt(msgLength);
+			dataOutputStream.write(msg.getBytes());
+			dataOutputStream.flush();
 
 			DataInputStream dataInputStream;
 			dataInputStream = new DataInputStream(socket.getInputStream());
 			int length;
 			byte[] dataBytes;
 			String response;
-			length = dataInputStream.readInt(); // i send the length at first
+			length = dataInputStream.readInt();
 
-			dataBytes = new byte[length]; // create array as a buffer
+			dataBytes = new byte[length];
 
-			dataInputStream.read(dataBytes); // read the data into the buffer array
+			dataInputStream.read(dataBytes);
 
-			response = new String(dataBytes); // convert to string
-			
+			response = new String(dataBytes);
+
 			clientReader.add(response);
-			
-			System.out.println(response);
-			
-			Long start = System.currentTimeMillis();
 
-			while (System.currentTimeMillis() - start < (Math.random()*3000)) {
+			Long start = System.currentTimeMillis();
+			while (System.currentTimeMillis() - start < (Math.random() * 3000)) {
 			}
 		}
-		
-		String filename = "arg"+clientNumber+".txt";
+
+		String filename = "log" + clientNumber + ".txt";
 		PrintWriter writer = new PrintWriter(filename, "UTF-8");
 		for (int i = 0; i < clientReader.size(); i++) {
 			writer.println(clientReader.get(i));

@@ -1,4 +1,7 @@
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.LinkedList;
@@ -13,7 +16,11 @@ public class MainServer {
 	static Semaphore semaphoreValue = new Semaphore(1);
 	static LinkedList<String> readerTuples = new LinkedList<String>();
 	static LinkedList<String> writerTuples = new LinkedList<String>();
-	static int rnum;
+	static int rnum = 0;
+	static int readersSize;
+	static int writersSize;
+	static int numberOfAccess;
+	static int totalConnection;
 
 	public static void main(String[] args) throws IOException {
 		int rseq = 0;
@@ -24,6 +31,12 @@ public class MainServer {
 		System.out.println("server started successfully.");
 
 		// int clientNumber = -1;
+
+		readersSize = Integer.valueOf(args[0]);
+		writersSize = Integer.valueOf(args[1]);
+		numberOfAccess = Integer.valueOf(args[2]);
+
+		totalConnection = (readersSize + writersSize) * numberOfAccess;
 
 		while (true) {
 			rseq++;
@@ -37,17 +50,23 @@ public class MainServer {
 	}
 
 	public static int[] serviceReader(int id) {
-		
-		int[] arr = new int[2];
+
+		int[] arr = new int[3];
 		try {
 			semaphore.acquire();
 			arr[0] = ++sSeq;
 			arr[1] = value;
-			String line = sSeq + " " + value + " " + id +" "+rnum;
-			System.out.println(line);
-			readerTuples.add(line);
+			arr[2] = totalConnection;
 			
-			
+			if (id < readersSize) {
+				String line = sSeq + " " + value + " " + id + " " + rnum;
+				System.out.println(line);
+				readerTuples.add(line);
+			} else {
+				String line = sSeq + " " + id + " " + id ;
+				System.out.println(line);
+				writerTuples.add(line);
+			}
 			semaphore.release();
 		} catch (InterruptedException e) {
 
@@ -58,22 +77,8 @@ public class MainServer {
 
 	}
 
-	public static int getValue() {
-		
-
-		// semaphore.acquire();
-		int num = value;
-		semaphore.release();
-		// } catch (InterruptedException e) {
-
-		// e.printStackTrace();
-		// }
-
-		return num;
-
-	}
 	public static void increaseRnum() {
-	
+
 		try {
 			semaphoreRnum.acquire();
 			rnum++;
@@ -82,9 +87,9 @@ public class MainServer {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void decreaseRnum() {
-		
+
 		try {
 			semaphoreRnum.acquire();
 			rnum--;
@@ -93,9 +98,9 @@ public class MainServer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
+
 	}
-	
+
 	public static void changeValue(int value) {
 		try {
 			semaphoreValue.acquire();
@@ -105,20 +110,30 @@ public class MainServer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	
+
 	}
 
-	/*public static void writeReaderTuple(int sSeqIn, int valueIn, int id) {
+	public static void closeServer() {
+
+		PrintWriter writer;
 		try {
-			semaphorePrint.acquire();
-			String line = sSeqIn + " " + valueIn + " " + id+" "+rnum;
-			readerTuples.add(line);
-			semaphorePrint.release();
-		} catch (InterruptedException e) {
-			
+			writer = new PrintWriter("serverlog.txt", "UTF-8");
+			writer.println("Readers :");
+			for (int i = 0; i < readerTuples.size(); i++) {
+				writer.println(readerTuples.get(i));
+			}
+			writer.println("writers :");
+			for (int i = 0; i < writerTuples.size(); i++) {
+				writer.println(writerTuples.get(i));
+			}
+			writer.close();
+		} catch (FileNotFoundException | UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println(MainServer.readerTuples.getLast());
-	}*/
+		
+		System.exit(0);
+		
+	}
 
 }

@@ -1,8 +1,6 @@
-import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.LinkedList;
 import java.util.Properties;
 
@@ -41,18 +39,8 @@ public class Start {
 			System.out.println("SFTP Channel created.");
 
 			ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
-
-			InputStream in = channelExec.getInputStream();
-
 			channelExec.setCommand(command);
-
 			channelExec.connect();
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-			String s;
-			while ((s = reader.readLine()) != null)
-				System.out.println(s);
-			reader.close();
 
 		} catch (Exception e) {
 			System.err.print(e);
@@ -84,19 +72,9 @@ public class Start {
 				System.out.println("SFTP Channel created.");
 
 				ChannelExec channelExec = (ChannelExec) session.openChannel("exec");
-
-				InputStream in = channelExec.getInputStream();
-
-
 				channelExec.setCommand(command+" "+(i+offset));
 				channelExec.connect();
 
-				/*BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-				String s;
-				while ((s = reader.readLine()) != null)
-					System.out.println(s);
-				reader.close();
-*/
 			} catch (Exception e) {
 				System.err.print(e);
 			}
@@ -156,7 +134,7 @@ public class Start {
 	}
 
 	public void runServer() {
-		String command = "java MainServer";
+		String command = "java MainServer "+readers.size()+" "+writers.size()+" "+numberOfAccesses;
 		runSSH(serverIp, serverUsername, serverPassword, command);
 	}
 
@@ -173,9 +151,10 @@ public class Start {
 	public static void main(String[] args) {
 		Start st = new Start();
 		st.parseConfiguration();
-		//st.runServer();
+		st.runServer();
 		st.runClientReader();
 		st.runClientWriter();
+		System.exit(0);
 		
 	}
 
