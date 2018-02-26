@@ -46,6 +46,10 @@ public class ClientWriter {
 		}
 		String filename = "log" + clientNumber + ".txt";
 		PrintWriter writer = new PrintWriter(filename, "UTF-8");
+		writer.println("Client type: Writer");
+		writer.println("Client Name: "+clientNumber);
+		writer.println("rSeq sSeq");
+		
 		for (int i = 0; i < clientReader.size(); i++) {
 			writer.println(clientReader.get(i));
 		}

@@ -50,6 +50,9 @@ public class ClientReader {
 
 		String filename = "log" + clientNumber + ".txt";
 		PrintWriter writer = new PrintWriter(filename, "UTF-8");
+		writer.println("Client type: Reader");
+		writer.println("Client Name: "+clientNumber);
+		writer.println("rSeq sSeq oVal");
 		for (int i = 0; i < clientReader.size(); i++) {
 			writer.println(clientReader.get(i));
 		}

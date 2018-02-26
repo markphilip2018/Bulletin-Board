@@ -119,10 +119,12 @@ public class MainServer {
 		try {
 			writer = new PrintWriter("serverlog.txt", "UTF-8");
 			writer.println("Readers :");
+			writer.println("sSeq oVal rID rNum");
 			for (int i = 0; i < readerTuples.size(); i++) {
 				writer.println(readerTuples.get(i));
 			}
 			writer.println("writers :");
+			writer.println("sSeq oVal wID");
 			for (int i = 0; i < writerTuples.size(); i++) {
 				writer.println(writerTuples.get(i));
 			}
